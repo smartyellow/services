@@ -85,7 +85,7 @@ module.exports = {
       method: 'get',
       requires: [ 'smartyellow/services/seeMyServices', 'smartyellow/services/seeAllServices' ],
       handler: async (req, res, user) => {
-        const q = server.storage({ user }).store('services').find().sort({ 'log.created.on': -1 });
+        const q = server.storage({ user }).store('smartyellow/service').find().sort({ 'log.created.on': -1 });
         const result = await (req.headers['format'] == 'object' ? q.toObject() : q.toArray());
         res.json(result);
       },
@@ -190,10 +190,10 @@ module.exports = {
       requires: 'smartyellow/services/deleteServices',
       handler: async (req, res, user) => {
         // Check if user is allowed to see service to be deleted
-        const services = await server.storage({ user }).store('services').find().toObject();
+        const services = await server.storage({ user }).store('smartyellow/service').find().toObject();
         if (services[req.params[0]]) {
           // User is allowed to see the service to be deleted, continue
-          await server.storage({ user }).store('services').delete({ id: req.params[0] });
+          await server.storage({ user }).store('smartyellow/service').delete({ id: req.params[0] });
           // broadcast reload trigger
           server.publish('cms', 'smartyellow/services/reload');
         }
@@ -239,7 +239,7 @@ module.exports = {
           user: user,
         });
         const storageQuery = server.storage({ user }).prepareQuery(filters, query, req.body.languages || false);
-        const find = server.storage({ user }).store('services').find(storageQuery);
+        const find = server.storage({ user }).store('smartyellow/service').find(storageQuery);
         const result = await (req.headers['format'] == 'object' ? find.toObject() : find.toArray());
         res.json(result);
       },
